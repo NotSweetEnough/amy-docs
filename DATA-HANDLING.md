@@ -1,0 +1,60 @@
+# Data handling
+
+## Who receives data
+
+Amy runs in the browser inside Azure DevOps. AI features send content **only to the backend your organization administrator configured**. That backend is operated by your organization or a provider it selected, and it forwards content to the AI provider it is configured with.
+
+The Marketplace publisher operates **no backend, no AI subscription and no data store** for Amy, and receives no Wiki, work-item, pull-request or usage data. The extension does not include a shared or default remote backend.
+
+## What is sent, and when
+
+Content is sent only when a user triggers the corresponding action:
+
+| Action | Content sent to the configured backend |
+| --- | --- |
+| Generate backlog / regenerate item | Markdown of the selected Wiki page, the instruction, page title and path, process work-item types, area and iteration path names |
+| Test Cases | Story title, description, acceptance criteria |
+| Documentation assistant | Markdown of the loaded Wiki page and the command or instruction |
+| Ask the Wiki | The question and the most relevant passages (page title, path, section, text) from the chosen scope. In scopes over 40 pages, the question's keywords also go to Azure DevOps Wiki Search, inside your organization and with the user's own permissions, to choose the pages. With **Session memory** on (1.1, default), also the chat's last six earlier questions and answers (answers shortened); they are kept in the browser only until the user leaves the chat. With **Web search** on (1.1), the backend may send the question, and only the question, to the web search service your organization configured |
+| Amy on work items (more actions) / bulk operations | Title, description, acceptance criteria, repro steps and comments of the selected work items |
+| Release documentation | ID, type, title, state, description excerpt and link of the selected work items |
+| Pull-request docs (1.0 backends) | PR title, description, branch names, changed file paths, commit messages (no code diff) and relevant Wiki passages |
+| Create a Wiki Page | The prompt, the chosen template's section names, and optionally the selected page's Markdown and the selected work items' text |
+| Summarize Wiki Content | Passages of the pages in the chosen scope (page title, path, section, text) and the optional focus |
+| Create Work Items | The title and short description you typed |
+| Field controls on work items | The field's current text (Improve only; never for Regenerate), the title and the other supported text fields, the template outline |
+| Pull-request documentation checks | Nothing from the browser except the time frame and scope of on-demand reviews. The backend reads PR metadata (no code diff) and the configured Wiki pages itself |
+| MCP (AI clients) | The tool arguments the AI client sends; the backend reads the named Wiki pages and work items with the user's own permissions |
+
+Every request also carries a correlation ID, the Azure DevOps organization name and, as a label, the current project name. Backends offering `ai-settings` also receive the user's AI settings (model, thinking, response length, web search); the extension keeps them in memory for the conversation only.
+
+## What the extension stores
+
+- **Organization configuration:** backend URL, display name, flags, API version, trusted hostnames and change history, in Azure DevOps extension data.
+- **Per user:** whether the user has confirmed a backend hostname, in Azure DevOps extension data.
+- **Backend session token:** in page memory only.
+- **Project templates:** template names and section names per project, in Azure DevOps extension data.
+
+Nothing is stored in browser storage.
+
+## User confirmation
+
+- Users confirm the backend before first use and after every change.
+- Wiki and work-item changes require explicit confirmation: a creation summary, per-change review and an extra confirmation above 10 items.
+
+## Reference backend behaviour
+
+The reference backend (`backend/`):
+
+- **Content:** does not store request content. Logs contain metadata only: correlation ID, operation, organization, pseudonymous user reference, latency, outcome, token counts.
+- **Credentials:** redacts credentials.
+- **Per-organization records:** keeps usage counters and audit records per organization, in memory.
+- **Stored proposals (only when pull-request checks or MCP are enabled):** in the organization's own storage account, keyed by organization. It keeps:
+  - pending and decided Wiki proposals (page path, proposed changes or new page content, reasons, source pull requests);
+  - backlog proposals from AI clients;
+  - pull-request review records (status, impact summary);
+  - service-hook delivery IDs;
+  - the check settings.
+
+  Proposals from AI clients are visible to their requester only. Pull-request proposals are visible to the organization's Amy users. Blob versioning and a 14-day soft delete apply; delete blobs under `orgs/<organization>/` to remove an organization's data.
+
