@@ -24,7 +24,7 @@ Users sign in to the backend with their work account.
 1. In the Microsoft Entra admin center, create an app registration (single tenant), for example "Amy backend". Note the **Application (client) ID** (`<client-id>`) and **Directory (tenant) ID** (`<tenant-id>`).
 2. Add a **Web** redirect URI: `https://<app>.azurewebsites.net/auth/callback`.
 3. Create a **client secret**. You store it in Key Vault in step 3; don't save it anywhere else.
-4. Under **API permissions**, check that Microsoft Graph **openid** and **profile** (delegated) are listed, and add **Azure DevOps > user_impersonation** (delegated). The backend uses it once at sign-in to check that the user belongs to your Azure DevOps organization.
+4. Under **API permissions**, check that Microsoft Graph **openid** and **profile** (delegated) are listed, and add **Azure DevOps** delegated permissions **vso.profile**, **vso.wiki**, **vso.work** and **vso.code** (all read-only; not `user_impersonation`). The backend uses vso.profile once at sign-in to check that the user belongs to your Azure DevOps organization, and the others only for the MCP server, acting as the signed-in user.
 5. Select **Grant admin consent for <your tenant>**. This needs a Cloud Application Administrator, Application Administrator or Global Administrator. Without it, users are asked for admin approval when they sign in.
 
 Optional: define an app role (for example `Amy.User`), assign it to users or groups, and set `REQUIRED_APP_ROLE` in step 4 to limit who may use Amy.

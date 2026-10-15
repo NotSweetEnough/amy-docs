@@ -16,12 +16,12 @@ From top to bottom: the header with Amy's logo (AI settings) and the connection 
 
 | Tab | Quick actions |
 | --- | --- |
-| **Wiki** | Ask or Summarize Wiki, Create a Wiki Page, Edit a Wiki Page |
-| **Work Items** | Create Work Items, Generate Backlog Hierarchy |
-| **Documentation** | Review Pull Request Documentation, Generate Release or Sprint Documentation |
-| **Others** | Bulk Operations, Project Templates, Create Sprint Schedule |
+| **Wiki** | Ask Amy, Create a Wiki Page, Edit a Wiki Page |
+| **Work Items** | Ask about Work Items, Create Work Items, Generate Backlog Hierarchy |
+| **Documentation** | Review Pull Request Documentation, Generate Release or Sprint Documentation, Generate Architecture Documentation, Debate Architecture |
+| **Others** | Project Templates, Create Sprint Schedule |
 
-Amy opens with **Ask or Summarize Wiki**. Selecting a tab shows its cards; selecting a card starts its task, and the cards collapse into a bar with the task's name and **Change action**. Drafts are kept when you switch tasks and come back.
+Amy opens with **Ask Amy**. Selecting a tab shows its cards; selecting a card starts its task, and the cards collapse into a bar with the task's name and **Change action**. Drafts are kept when you switch tasks and come back.
 
 **Wiki scope.** Questions and summaries use the active Wiki of the project (switch it next to the filter if the project has several):
 
@@ -50,11 +50,17 @@ The **Wiki Scope Preview** beside the conversation shows "Entire wiki selected",
 
 The settings never change your permissions, the Wiki scope or the approval steps; the backend checks them on every request.
 
+**Identity and personas.** The AI Settings also hold **Identity and personas**: a Wiki page tree that shapes how Amy writes, like skills. **Create persona pages** previews and creates `/Amy` (who Amy is: voice and house rules) and one subpage per quick action (Ask and Summarize, Create a Wiki Page, Edit and Review Wiki Pages, Create Work Items and Backlogs, Work Item Improvements, Test Cases, Pull Request Documentation, Release and Sprint Documentation, Architecture Documentation, Architecture Debate). The starting text describes Amy's current behavior, so creating the pages changes nothing until someone edits them.
+
+- Edit a page in the Wiki to change tone, length, format, focus or method for that quick action; the change applies from the next request. Each quick action has exactly one persona page.
+- Personas never change the checks, citations, "not enough evidence" answers or the confirmation before anything is saved. Your own Response length setting wins over a persona's length.
+- Anyone who can edit the Wiki can edit these pages; the page history shows every change. Without persona pages Amy uses its built-in behavior. **Open in Wiki** opens the tree; **Add missing pages** adds pages that were deleted or added in a newer Amy version.
+
 **Approval.** Everything that creates or changes content follows **Generate → Review → Approve → Save**:
 
 - Existing content stays as it is until you approve its replacement.
 - You can apply a proposal, request another version, or cancel.
-- In bulk workflows you review each change and approve selected changes together. Only approved changes are saved.
+- Where several proposals wait (pull-request documentation), you review each one and can approve selected ones together. Only approved changes are saved.
 
 ### Page-only mode
 
@@ -146,9 +152,18 @@ Code wikis (published from a repository) are read-only here.
 
 The results table lists the type, ID (linked to Azure DevOps), title, parent and status (`created`, `existing`, `skipped`, `failed`, `dry-run`) of each item. If some items fail, the others are still created. Children of a failed item are skipped so that the hierarchy stays correct. Fix the cause and create the remaining items again; items that were already created are deselected automatically. **Copy summary** copies a tab-separated summary.
 
-## Ask or Summarize Wiki
+## Ask Amy
 
-Choose the Wiki scope, then type a question and select **Send**, or select **Summarize**. There is no separate question field and no page to load: the scope filter decides what is read (at most 40 pages). In a larger scope, a question reads the pages Azure DevOps Wiki Search finds for its keywords (the result says "found by Wiki search"); without the Search extension or a match, the first 40 pages are read and the result says the scope was cut.
+**Sources.** Choose **Wiki**, **Work items** or **Both** above the scope filter. **Ask about Work Items** (Work Items tab) opens the same chat with Work items selected. With work items among the sources:
+
+- A **work-item filter** appears: **Time frame** (any time, last 30 days, this or last quarter, this year, custom range), **Date means** (completed, created or changed; completed by default), **Types** and **Area**. The time frame applies to work items only; with Both, the Wiki part is never filtered by date. When your question names a period ("in Q3", "last year"), Amy uses it and updates the filter.
+- Overview questions ("a structured overview of everything we finished in Q3") get themes grouped by Epic with the items of each. Topic questions ("did we ever implement single sign-on with Entra?") search for the subject and related terms (shown in the answer) and get a verdict (implemented, partly, planned, not found), confidence and a table of the work items used, each linked and with the quoted evidence. Wiki sources are listed separately.
+- Each answer starts with the filter it used; **Change filter** jumps to it. At most 300 items are read per question; the answer says when more matched.
+- When related items share no Epic, **Connect them under a new Epic…** proposes one (title, area, description) and shows the link each item gets. Existing parents never change: Features without a parent become children of the Epic, other items get a Related link, items already under one of them need none. Nothing is created until you confirm.
+- **Publish as Wiki page…** creates the answer as a new page, with a link to every work item, after you approve it.
+- The checkbox reads **Sources Only Answer Mode**. Amy sees only work items you can read.
+
+**Wiki.** Choose the Wiki scope, then type a question and select **Send**, or select **Summarize**. There is no separate question field and no page to load: the scope filter decides what is read (at most 40 pages). In a larger scope, a question reads the pages Azure DevOps Wiki Search finds for its keywords (the result says "found by Wiki search"); without the Search extension or a match, the first 40 pages are read and the result says the scope was cut.
 
 Each answer lists its sources: page link, section heading, Wiki and the exact supporting passage, with a confidence level. If the pages don't contain the answer, you get **Insufficient evidence** instead of a guess. With **Wiki Only Answer Mode** off, general background appears separately as "General knowledge (not from the Wiki)". Retrieved Wiki content is treated as source material, never as instructions to Amy.
 
@@ -181,11 +196,14 @@ To look for duplicates without creating anything, type for example "Find duplica
 
 Results of the automatic checks are reused: a pull request already checked after completion shows **Completed** right away, and a running check is never started twice. **Completed** means the analysis finished, not that anything was approved or saved.
 
-**Results.** **View results** shows the documentation impact and the pages Amy proposes to create or update, or that no updates are needed. Proposals open in **Pending proposals**:
+**Results.** **View results** shows the documentation impact and the pages Amy proposes to create or update, or that no updates are needed. **Review** opens the proposal in **Approval Requests**.
 
-- **Update** proposals open side by side (**Current version | Proposed version**). Reject individual changes if needed, then select **Approve Changes**.
+**Approval Requests.** The panel has two sub-tabs: **Approval Requests (N)** and **Find and Analyze** (search and analysis above). Approval Requests opens first when requests are waiting; the quick action card shows their number in a red bubble and the Documentation tab shows a dot. There is one request per Wiki page; a page changed by several pull requests is one request. Filter by **Repository** and **Origin** (pull requests or AI clients).
+
+- **Update** proposals open with **Review changes**, side by side (**Current version | Proposed version**). Accept or reject individual changes, then select **Approve Changes**.
 - **New page** proposals (release notes, upgrade and migration instructions) show a preview first, then **Approve Changes**.
-- Select several proposals and choose **Approve selected** to approve them together. **Dismiss** removes a proposal without changing the Wiki.
+- **Reject** removes a request without changing the Wiki. Select several requests to **Approve selected** or **Reject selected** together.
+- Anyone who can edit the Wiki can approve or reject.
 
 Before saving, Amy checks that the page has not changed since the proposal was prepared. If it has, Amy prepares the proposal again against the latest version and asks you to approve it again. When several pull requests affect the same page, they are combined in its pending proposal; every new revision needs a fresh approval.
 
@@ -203,6 +221,25 @@ Proposals you requested from an AI client through Amy's MCP server appear in the
 4. Review and edit the page. Sprint documentation is named after the sprint (for example "Sprint 12"), other types "Sprint 12 – Release notes". Select **Create Wiki page** to approve its creation.
 
 Selecting a release instead of a sprint is not available yet. To create the sprints themselves, use **Create Sprint Schedule**.
+
+## Generate Architecture Documentation
+
+Select **Documentation > Generate Architecture Documentation**. Your organization's backend must offer it; it is off unless an administrator enables it, because source code is sent to the backend and its AI provider.
+
+1. **Start.** Choose the repositories (default branch). Amy shows what it reads: files found and selected (manifests, infrastructure as code, pipelines, configuration, API definitions, docs in the repositories, then source code across all folders), with **Show selected files** for the details and what is not uploaded (dependencies and build output, binaries, lock files, secrets files, generated files; tests are listed only). Classic build and release pipelines are read too. It compares with the entire Wiki and estimates time and tokens. Values that look like keys, passwords or connection strings are masked before upload.
+2. **Main page.** The tree goes under **`<project> Documentation`** in the project Wiki. If a page with that name exists that Amy did not create, enter another name; Amy never changes pages it did not generate.
+3. **Running.** The job runs on your organization's backend in four steps (analyze modules, build the system model, compare with the Wiki, write pages). You can close Amy meanwhile. When it is done, the card shows a small red bubble and the Documentation tab a dot; they clear when you open the result. A failed job shows the bubble too; **Retry from step N** continues where it stopped.
+4. **Review.** The page tree follows arc42: the main page with a context diagram, 1 Introduction and Goals through 12 Glossary, a subpage per building block, runtime flow and crosscutting concept, **Code vs. Wiki Differences** (contradictions, parts missing in the Wiki, Wiki content not found in the code) and **About This Documentation**. Code references link to the analyzed commit; diagrams are Mermaid. Clear a box to leave a page out, then **Create N pages**. Creating or **Discard** deletes the stored result.
+5. **Running it again** proposes changes to the existing tree only: changed pages side by side (accept or reject each change), new pages, and pages of parts that left the code (a note is added; pages are never deleted).
+
+## Debate Architecture
+
+Available once **`<project> Documentation`** exists. Describe a decision or argue your case. Amy answers as a principal engineer, grounded in the documentation, its differences page and the decision records: a position, real options compared on the same quality attributes, the standards behind each argument, a pre-mortem, and what would change its mind, with links to the pages it used. It changes its position only on new evidence and says so.
+
+- **Mode:** **Advise** (Amy's own recommendation) or **Challenge me** (Amy argues against your proposal on purpose).
+- When Amy needs code, it reads specific files with your permissions and lists them under **Read from the code**.
+- The method comes from the **Architecture Debate** persona page (the Grand Master method by default). Debates use the model selected in AI settings, with thinking on when the model supports it.
+- **Save as decision record (ADR)…** drafts a record in the MADR format under **9 Architecture Decisions**; edit it and select **Create page**.
 
 ## Create Sprint Schedule
 
@@ -223,24 +260,6 @@ Lists the templates Amy uses in the current project: built-in Wiki page template
 - **Approve and save** stores it, with a higher version number, for everyone in the project.
 - **Remove** a project version to return to the built-in template.
 - If someone else saved meanwhile, nothing is overwritten; reload and try again.
-
-## Bulk operations
-
-Select **Others > Bulk Operations**.
-
-1. Find work items by type, state, title text or IDs, and select up to 25.
-2. Choose an action:
-   - **Generate Tasks for selected User Stories:** Tasks are proposed per story. Untick any you don't want; the rest are created under their story, in the story's Area Path.
-   - **Generate acceptance criteria for selected draft items:** shows current | proposed criteria per item. Updates are rejected for any item that someone changed after the preview was made.
-   - **Generate Test Cases for selected User Stories:** Test Cases from each story's acceptance criteria. The ones you keep are created and linked to their story with "Tested By".
-   - **Improve descriptions of selected work items:** current | proposed description per item; same concurrency check as acceptance criteria.
-   - **Create Wiki summaries for selected Features:** one new page per Feature under the parent path you choose. It lists the description, acceptance criteria and child work items. Existing pages are skipped, never overwritten.
-   - **Link selected work items to a Wiki page:** adds a hyperlink to the chosen page. Items that already have the link are skipped.
-   - **Generate one release or sprint page from selected items:** choose the document type and enter a release or sprint name. Use the **Iteration Path** filter to select a sprint's items.
-     - Document types: sprint scope, release notes, deployment checklist, known limitations, testing summary, support handover, operational readiness, rollback plan, post-release validation.
-     - The draft links every work item it mentions. Work items that were not selected cannot appear in it.
-     - Missing information is marked TODO. Edit the draft, then create it as a new page; existing pages are never overwritten.
-3. Select **Preview**, untick any entries you don't want, confirm if there are more than 10, and select **Run**. The results list each entry as created, updated, skipped or failed.
 
 ## Amy on every work item
 
