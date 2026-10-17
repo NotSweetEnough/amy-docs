@@ -51,11 +51,13 @@ The **Wiki Scope Preview** beside the conversation shows "Entire wiki selected",
 
 The settings never change your permissions, the Wiki scope or the approval steps; the backend checks them on every request.
 
-**Identity and personas.** The AI Settings also hold **Identity and personas**: a Wiki page tree that shapes how Amy writes, like skills. **Create persona pages** previews and creates `/Amy` (who Amy is: voice and house rules) and one subpage per quick action (Ask and Summarize, Create a Wiki Page, Edit and Review Wiki Pages, Create Work Items and Backlogs, Work Item Improvements, Test Cases, Pull Request Documentation, Release and Sprint Documentation, Architecture Documentation, Architecture Debate, Code Review). The starting text describes Amy's current behavior, so creating the pages changes nothing until someone edits them.
+**Model per quick action.** The **Model** list starts at **Set by your organization**: each quick action then uses the model and effort your organization's administrators set for it. Choose a model (and **Thinking**) to use it in every quick action instead. A quick action your organization **locked** always uses its own model; the menu shows 🔒 and which model applies.
 
-- Edit a page in the Wiki to change tone, length, format, focus or method for that quick action; the change applies from the next request. Each quick action has exactly one persona page.
-- Personas never change the checks, citations, "not enough evidence" answers or the confirmation before anything is saved. Your own Response length setting wins over a persona's length.
-- Anyone who can edit the Wiki can edit these pages; the page history shows every change. Without persona pages Amy uses its built-in behavior. **Open in Wiki** opens the tree; **Add missing pages** adds pages that were deleted or added in a newer Amy version.
+**Personas (administrators).** The last entry of the menu, **Personas**, is shown to organization administrators only. It holds, for the whole organization:
+- the **identity** (who Amy is: voice and house rules; `{project}` is replaced by the current project's name), and
+- one persona per quick action (Ask and Summarize, Create a Wiki Page, Edit and Review Wiki Pages, Create Work Items and Backlogs, Work Item Improvements, Test Cases, Pull Request Documentation, Release and Sprint Documentation, Architecture Documentation, Architecture Debate, Code Review), each with its text, a **Default model**, a **Default effort** (Model default, Off, Low, Medium, High; only what the model supports) and **Lock** (users can't choose another model or thinking for it).
+
+Personas are kept in your organization's backend, not in the Wiki: only administrators with the backend's admin role can see or change them, and other users' browsers never receive the texts. **Save** applies them to everyone's next request; **Restore the built-in text** brings back Amy's default for one persona, and the change history lists who changed what. When nothing is saved yet and the project has persona pages from an earlier version (`/Amy` in the Wiki), Amy offers to **Import** them once; the Wiki pages are then no longer read and can be deleted. Personas never change the checks, citations, "not enough evidence" answers or the confirmation before anything is saved; your own Response length setting wins over a persona's length.
 
 **Approval.** Everything that creates or changes content follows **Generate → Review → Approve → Save**:
 
@@ -239,7 +241,7 @@ Available once **`<project> Documentation`** exists. Describe a decision or argu
 
 - **Mode:** **Advise** (Amy's own recommendation) or **Challenge me** (Amy argues against your proposal on purpose).
 - When Amy needs code, it reads specific files with your permissions and lists them under **Read from the code**.
-- The method comes from the **Architecture Debate** persona page (the Grand Master method by default). Debates use the model selected in AI settings, with thinking on when the model supports it.
+- The method comes from the **Architecture Debate** persona (the Grand Master method by default). Debates use the model set for them (or your own choice), with thinking on unless the persona's effort or your setting says otherwise.
 - **Save as decision record (ADR)…** drafts a record in the MADR format under **9 Architecture Decisions**; edit it and select **Create page**.
 
 ## Review a Pull Request
@@ -252,7 +254,7 @@ On the **Code** tab. Available once **`<project> Documentation`** exists, like D
 4. **Review** takes a minute or two. The result shows a verdict, a summary, each acceptance criterion as **Met**, **Partly**, **Not met** or **Not in this pull request**, and the findings by severity: **Must fix**, **Should fix** and **Consider**. Each finding shows the code, the reason, a suggested change, what it is based on, and a link that opens the file at that line in the pull request. Findings whose file, line or code is not in the pull request are left out, and Amy says how many.
 5. **Copy as Markdown** (one finding or the whole review) to share it, for example as a comment you post yourself. The review is not stored; it stays until you start another one or leave Amy.
 
-The method comes from the **Code Review** persona page. Reviews use the model selected in AI settings, with thinking on when the model supports it.
+The method comes from the **Code Review** persona. Reviews use the model set for them (or your own choice), with thinking on unless the persona's effort or your setting says otherwise.
 
 ## Create Sprint Schedule
 

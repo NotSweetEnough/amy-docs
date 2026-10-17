@@ -4,7 +4,7 @@
 
 | Scope | Why it is needed | Used by |
 | --- | --- | --- |
-| `vso.wiki_write` | Read Wiki pages (including the persona pages); save edits (version-checked) and create pages (create-only, also the persona pages) **after the user confirms** | Hub, documentation assistant, Ask the Wiki |
+| `vso.wiki_write` | Read Wiki pages (including the persona pages of an earlier version, for a one-time import); save edits (version-checked) and create pages (create-only) **after the user confirms** | Hub, documentation assistant, Ask the Wiki |
 | `vso.work_write` | Read and query work items, types, area and iteration paths; create or update work items (also a connecting Epic and its links), create iterations and add them to a team's sprints, each **after the user confirms** | Hub, Ask about Work Items, Amy on work items, Create Sprint Schedule |
 | `vso.project` | List projects and teams, read the process template | Hub |
 | `vso.code` | **Read-only** search of merged and active pull requests, pull-request metadata (title, description, branches, file paths, commits, linked work items), the repository list, and repository files for architecture documentation, debates and pull-request reviews. Reviews post nothing to the pull request | Pull-request docs, organization settings, Generate Architecture Documentation, Debate Architecture, Review a Pull Request |
