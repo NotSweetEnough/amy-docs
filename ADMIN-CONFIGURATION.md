@@ -4,7 +4,7 @@ Amy does not include a hosted AI service. After installing the extension, an Azu
 
 ## Configure
 
-1. Open **Amy** in any project, select the **Amy logo** (top left), then **Backend settings**. Everyone can open it; only Project Collection Administrators (direct members) can change it.
+1. Open **Amy** in any project, select the **Amy logo** (top left), then **Admin settings > Backend settings**. Admin settings are shown to Project Collection Administrators (direct members, or any member the backend recognizes) only.
 2. Enter:
    - **Backend URL:** `https://` only. It must not contain credentials, a query string or a fragment; trailing slashes are removed.
    - **Display name.**
@@ -51,7 +51,7 @@ Recommended: restrict user consent in Entra ID, use a trusted hostname policy, a
 
 ## Pull-request documentation checks
 
-Shown under **Amy logo > Backend settings** when the backend offers them (see [DEPLOY.md](DEPLOY.md#optional-pull-request-documentation-checks)). Changing them requires the backend's administrator app role (`Amy.Admin` by default); everyone else sees them read-only.
+Shown under **Amy logo > Admin settings > Pull-request documentation checks** when the backend offers them (see [DEPLOY.md](DEPLOY.md#optional-pull-request-documentation-checks)). Changing them requires membership in Project Collection Administrators (when the backend has its own Azure DevOps access) or the backend's administrator app role (`Amy.Admin` by default); everyone else sees them read-only.
 
 - **Repositories.** Add repositories and choose per repository whether completed pull requests are checked **automatically** or only on demand.
 - **Wiki scope.** The Wikis, optionally limited to a path, that Amy reads and proposes changes for.
