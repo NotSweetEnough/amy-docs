@@ -17,7 +17,7 @@ Content is sent only when a user triggers the corresponding action:
 | Documentation assistant | Markdown of the loaded Wiki page and the command or instruction |
 | Ask the Wiki | The question and the most relevant passages (page title, path, section, text) from the chosen scope. In scopes over 40 pages, the question's keywords also go to Azure DevOps Wiki Search, inside your organization and with the user's own permissions, to choose the pages. With **Session memory** on (1.1, default), also the chat's last six earlier questions and answers (answers shortened); they are kept in the browser only until the user leaves the chat. With **Web search** on (1.1), the backend may send the question, and only the question, to the web search service your organization configured |
 | Amy on work items (more actions) | Title, description, acceptance criteria, repro steps and comments of the selected work items |
-| Release documentation | ID, type, title, state, description excerpt and link of the selected work items |
+| Release documentation | ID, type, title, state, description excerpt and link of the selected work items; the sprint goal and notes the user entered |
 | Pull-request docs (1.0 backends) | PR title, description, branch names, changed file paths, commit messages (no code diff) and relevant Wiki passages |
 | Create a Wiki Page | The prompt, the chosen template's section names, and optionally the selected page's Markdown and the selected work items' text |
 | Summarize Wiki Content | Passages of the pages in the chosen scope (page title, path, section, text) and the optional focus |
