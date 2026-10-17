@@ -12,13 +12,14 @@ Quick actions that your organization's backend does not offer say so on their bo
 
 ## The Amy hub
 
-From top to bottom: the header with Amy's logo (AI settings) and the connection status (select it for details), four tabs, the **Wiki scope** filter (on the Wiki tab only), the quick action cards, and the workspace with the conversation.
+From top to bottom: the header with Amy's logo (AI settings) and the connection status (select it for details), five tabs, the **Wiki scope** filter (on the Wiki tab only), the quick action cards, and the workspace with the conversation.
 
 | Tab | Quick actions |
 | --- | --- |
 | **Wiki** | Ask Amy, Create a Wiki Page, Edit a Wiki Page |
 | **Work Items** | Ask about Work Items, Create Work Items, Generate Backlog Hierarchy |
 | **Documentation** | Review Pull Request Documentation, Generate Release or Sprint Documentation, Generate Architecture Documentation, Debate Architecture |
+| **Code** | Review a Pull Request |
 | **Others** | Project Templates, Create Sprint Schedule |
 
 Amy opens with **Ask Amy**. Selecting a tab shows its cards; selecting a card starts its task, and the cards collapse into a bar with the task's name and **Change action**. Drafts are kept when you switch tasks and come back.
@@ -50,7 +51,7 @@ The **Wiki Scope Preview** beside the conversation shows "Entire wiki selected",
 
 The settings never change your permissions, the Wiki scope or the approval steps; the backend checks them on every request.
 
-**Identity and personas.** The AI Settings also hold **Identity and personas**: a Wiki page tree that shapes how Amy writes, like skills. **Create persona pages** previews and creates `/Amy` (who Amy is: voice and house rules) and one subpage per quick action (Ask and Summarize, Create a Wiki Page, Edit and Review Wiki Pages, Create Work Items and Backlogs, Work Item Improvements, Test Cases, Pull Request Documentation, Release and Sprint Documentation, Architecture Documentation, Architecture Debate). The starting text describes Amy's current behavior, so creating the pages changes nothing until someone edits them.
+**Identity and personas.** The AI Settings also hold **Identity and personas**: a Wiki page tree that shapes how Amy writes, like skills. **Create persona pages** previews and creates `/Amy` (who Amy is: voice and house rules) and one subpage per quick action (Ask and Summarize, Create a Wiki Page, Edit and Review Wiki Pages, Create Work Items and Backlogs, Work Item Improvements, Test Cases, Pull Request Documentation, Release and Sprint Documentation, Architecture Documentation, Architecture Debate, Code Review). The starting text describes Amy's current behavior, so creating the pages changes nothing until someone edits them.
 
 - Edit a page in the Wiki to change tone, length, format, focus or method for that quick action; the change applies from the next request. Each quick action has exactly one persona page.
 - Personas never change the checks, citations, "not enough evidence" answers or the confirmation before anything is saved. Your own Response length setting wins over a persona's length.
@@ -240,6 +241,18 @@ Available once **`<project> Documentation`** exists. Describe a decision or argu
 - When Amy needs code, it reads specific files with your permissions and lists them under **Read from the code**.
 - The method comes from the **Architecture Debate** persona page (the Grand Master method by default). Debates use the model selected in AI settings, with thinking on when the model supports it.
 - **Save as decision record (ADR)…** drafts a record in the MADR format under **9 Architecture Decisions**; edit it and select **Create page**.
+
+## Review a Pull Request
+
+On the **Code** tab. Available once **`<project> Documentation`** exists, like Debate Architecture. The review is **read-only**: it is shown in Amy only. Amy doesn't comment, vote or change anything on the pull request, and needs no extra permission.
+
+1. **Choose the pull request.** The list shows the project's active pull requests: **I'm a reviewer**, **Created by me** or **All active**, optionally for one repository. To review a pull request of another project in the organization, paste its link.
+2. **Look for:** bugs and logic, security, reliability and performance, tests, readability and maintainability, whether the changes meet the linked work items, and whether they fit the architecture documentation. **Anything Amy should know** shifts the emphasis.
+3. **What Amy reads** lists what is sent: both versions of each changed file, with values that look like keys, passwords or connection strings masked; the title, description, branches and commit messages; the linked work items with their acceptance criteria; and the most relevant passages of the documentation. Lock files, secrets files, binaries, dependencies and generated files are skipped and listed. Existing comments are not read. For large pull requests, code comes before tests and documentation, up to the size budget.
+4. **Review** takes a minute or two. The result shows a verdict, a summary, each acceptance criterion as **Met**, **Partly**, **Not met** or **Not in this pull request**, and the findings by severity: **Must fix**, **Should fix** and **Consider**. Each finding shows the code, the reason, a suggested change, what it is based on, and a link that opens the file at that line in the pull request. Findings whose file, line or code is not in the pull request are left out, and Amy says how many.
+5. **Copy as Markdown** (one finding or the whole review) to share it, for example as a comment you post yourself. The review is not stored; it stays until you start another one or leave Amy.
+
+The method comes from the **Code Review** persona page. Reviews use the model selected in AI settings, with thinking on when the model supports it.
 
 ## Create Sprint Schedule
 

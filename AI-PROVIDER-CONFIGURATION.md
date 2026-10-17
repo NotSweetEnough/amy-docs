@@ -41,7 +41,7 @@ If your provider needs a different format, adapt `buildBody()` and `extractConte
 | `AI_PROVIDER_AUTH_HEADER` | no | for a real provider (api-key mode) | Header that carries the key, as documented by the provider |
 | `AI_PROVIDER_MODEL` | no | only if the provider needs it | Sent as `"model"` |
 | `AI_PROVIDER_API_VERSION` | no | only if the provider needs it | Sent as the `api-version` query parameter |
-| `AI_PROVIDER_TIMEOUT_MS` | no | no | Per-request timeout, default `60000`, at most `1800000` (30 minutes, for slow local models); timeouts are not retried |
+| `AI_PROVIDER_TIMEOUT_MS` | no | no | Per-request timeout, default `60000`, at most `1800000` (30 minutes, for slow local models); timeouts are not retried. Debates and pull-request reviews of large changes with thinking on may need 180000 or more |
 | `AI_PROVIDER_AUTH_SCHEME` | no | no | Optional prefix for the header value (only if documented) |
 | `AI_PROVIDER_MAX_RETRIES` | no | no | Retries for network errors and HTTP 408/429/5xx (default `2`, exponential backoff, honours `Retry-After` up to 10 s) |
 | `AI_PROVIDER_CORRELATION_HEADER` | no | no | Forwards the request correlation ID, if the provider supports such a header |
