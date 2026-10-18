@@ -18,7 +18,7 @@ From top to bottom: the header with Amy's logo (AI settings) and the connection 
 | --- | --- |
 | **Wiki** | Ask Amy, Create a Wiki Page, Edit a Wiki Page |
 | **Work Items** | Ask about Work Items, Create Work Items, Generate Backlog Hierarchy |
-| **Documentation** | Review Pull Request Documentation, Generate Release or Sprint Documentation, Generate Architecture Documentation, Debate Architecture |
+| **Documentation** | Review Pull Request Documentation, Generate Release or Sprint Documentation, Generate Project Documentation, Debate Architecture |
 | **Code** | Review a Pull Request |
 | **Others** | Project Templates, Create Sprint Schedule |
 
@@ -53,13 +53,13 @@ The settings never change your permissions, the Wiki scope or the approval steps
 
 **Model per quick action.** The **Model** list starts at **Set by your organization**: each quick action then uses the model and effort your organization's administrators set for it. Choose a model (and **Thinking**) to use it in every quick action instead. A quick action your organization **locked** always uses its own model; the menu shows 🔒 and which model applies.
 
-**Admin settings (administrators).** The last entry of the menu, **Admin settings**, is shown to organization administrators only. It opens a submenu with **Backend settings** (the organization's AI backend), **Personas** and, when the backend offers them, **Pull-request documentation checks**; on the admin page, tabs switch between them and **Back to Amy** returns.
+**Admin settings.** The last entry of the menu, **Admin settings**, opens **Organization settings > Amy AI** in a new browser tab, with tabs for **Backend settings** (the organization's AI backend), **Personas** (when the backend offers them) and **Pull-request documentation checks** (when the backend has them switched off, the tab lists what its operator has to configure). Azure DevOps decides who can open Organization settings. Administrators (Project Collection Administrators, or people your backend operator gave the admin role) also see **Monitoring**: a table of how often each quick action ran in the last 7, 30 or 90 days. One question, generation, review or documentation job counts once; only counts are kept, no content and no names.
 
-**Personas (administrators).** Under **Admin settings > Personas**, for the whole organization:
+**Personas (administrators).** Under **Organization settings > Amy AI > Personas**, for the whole organization:
 - the **identity** (who Amy is: voice and house rules; `{project}` is replaced by the current project's name), and
-- one persona per quick action (Ask and Summarize, Create a Wiki Page, Edit and Review Wiki Pages, Create Work Items and Backlogs, Work Item Improvements, Test Cases, Pull Request Documentation, Release and Sprint Documentation, Architecture Documentation, Architecture Debate, Code Review), each with its text, a **Default model**, a **Default effort** (Model default, Off, Low, Medium, High; only what the model supports) and **Lock** (users can't choose another model or thinking for it).
+- one persona per quick action (Ask and Summarize, Create a Wiki Page, Edit and Review Wiki Pages, Create Work Items and Backlogs, Work Item Improvements, Test Cases, Pull Request Documentation, Release and Sprint Documentation, Architecture Documentation, Architecture Debate, Code Review, Project Management Documentation), each with its text, a **Default model**, a **Default effort** (Model default, Off, Low, Medium, High; only what the model supports) and **Lock** (users can't choose another model or thinking for it).
 
-Personas are kept in your organization's backend, not in the Wiki: only administrators can see or change them (Project Collection Administrators, or people your backend operator gave the admin role), and other users' browsers never receive the texts. **Save** applies them to everyone's next request; **Restore the built-in text** brings back Amy's default for one persona, and the change history lists who changed what. When nothing is saved yet and the project has persona pages from an earlier version (`/Amy` in the Wiki), Amy offers to **Import** them once; the Wiki pages are then no longer read and can be deleted. Personas never change the checks, citations, "not enough evidence" answers or the confirmation before anything is saved; your own Response length setting wins over a persona's length.
+Personas are kept in your organization's backend, not in the Wiki: only administrators can see or change them (Project Collection Administrators, or people your backend operator gave the admin role), and other users' browsers never receive the texts. **Save** applies them to everyone's next request; **Restore the built-in text** brings back Amy's default for one persona, and each persona shows, like a Wiki page, who changed it last and when ("Built-in text, not changed yet" until someone does), and the change history lists who changed what. When nothing is saved yet and the project has persona pages from an earlier version (`/Amy` in the Wiki), Amy offers to **Import** them once; the Wiki pages are then no longer read and can be deleted. Personas never change the checks, citations, "not enough evidence" answers or the confirmation before anything is saved; your own Response length setting wins over a persona's length.
 
 **Approval.** Everything that creates or changes content follows **Generate → Review → Approve → Save**:
 
@@ -227,19 +227,35 @@ Proposals you requested from an AI client through Amy's MCP server appear in the
 
 Selecting a release instead of a sprint is not available yet. To create the sprints themselves, use **Create Sprint Schedule**.
 
-## Generate Architecture Documentation
+## Generate Project Documentation
 
-Select **Documentation > Generate Architecture Documentation**. Your organization's backend must offer it; it is off unless an administrator enables it, because source code is sent to the backend and its AI provider.
+Select **Documentation > Generate Project Documentation**. Your organization's backend must offer it; it is off unless an administrator enables it, because source code and Wiki content are sent to the backend and its AI provider. Two tabs, one job each (both can run and wait for review at the same time):
+
+- **Create architecture documentation**: from the repositories and the Wiki, an arc42 tree under **`<project> Architecture Documentation`**, described below.
+- **Create project management documentation**: the Wiki's content reorganized into a new tree under **`<project> Management Documentation`**, described after it.
+
+The two trees don't repeat each other: the architecture documentation leaves out project management topics (roadmap, team, way of working, meetings) and links the management documentation instead, and the other way around for architecture topics (system structure, components, infrastructure, technical decisions).
+
+### Create architecture documentation
 
 1. **Start.** Choose the repositories (default branch). Under **Projects**, add other projects whose repositories belong to the same system, for example deployment or infrastructure projects; their repositories are then named "repository (project)" in the documentation, which is still created in the current project's Wiki. You see only repositories you can read. Amy shows what it reads: files found and selected (manifests, infrastructure as code, pipelines, configuration, API definitions, docs in the repositories, then source code across all folders), with **Show selected files** for the details and what is not uploaded (dependencies and build output, binaries, lock files, secrets files, generated files; tests are listed only). Classic build and release pipelines are read too. It compares with the entire Wiki and estimates time and tokens. Values that look like keys, passwords or connection strings are masked before upload.
-2. **Main page.** The tree goes under **`<project> Documentation`** in the project Wiki. If a page with that name exists that Amy did not create, enter another name; Amy never changes pages it did not generate.
+2. **Main page.** The tree goes under **`<project> Architecture Documentation`** in the project Wiki. If a page with that name exists that Amy did not create, enter another name; Amy never changes pages it did not generate.
 3. **Running.** The job runs on your organization's backend in four steps (analyze modules, build the system model, compare with the Wiki, write pages). You can close Amy meanwhile. When it is done, the card shows a small red bubble and the Documentation tab a dot; they clear when you open the result. A failed job shows the bubble too; **Retry from step N** continues where it stopped.
 4. **Review.** The page tree follows arc42: the main page with a context diagram, 1 Introduction and Goals through 12 Glossary, a subpage per building block, runtime flow and crosscutting concept, **Code vs. Wiki Differences** (contradictions, parts missing in the Wiki, Wiki content not found in the code) and **About This Documentation**. Code references link to the analyzed commit; diagrams are Mermaid. Clear a box to leave a page out, then **Create N pages**. Creating or **Discard** deletes the stored result.
 5. **Running it again** proposes changes to the existing tree only: changed pages side by side (accept or reject each change), new pages, and pages of parts that left the code (a note is added; pages are never deleted).
 
+### Create project management documentation
+
+1. **Start.** Amy shows how many Wiki pages it reorganizes: the whole Wiki except the architecture documentation, its own tree and old `/Amy` persona pages. If a page named `<project> Management Documentation` exists that Amy did not create, enter another name.
+2. **Running.** Three steps on your organization's backend: **Understand the pages** (what each page holds), **Design the structure** (a page tree built from the content, closer to how software teams document a project; internal procedures and team-specific topics keep their own sections) and **Write pages**. The tile shows a red bubble when the result is ready.
+3. **Review.** The new tree with a preview of each page, **Source Coverage** (where each original page's content went now, or that the architecture documentation covers it) and **About This Documentation**. The new tree stands on its own: links between old pages point to the new pages that hold that content, and nothing links back into the old Wiki. Existing pages are never changed or moved; delete them yourself once the new tree is in use.
+4. **Running it again** proposes changes to the existing tree: changed pages side by side, new pages, and pages that are no longer part of the structure (flagged, never deleted).
+
+The method comes from the **Project Management Documentation** persona.
+
 ## Debate Architecture
 
-Available once **`<project> Documentation`** exists. Describe a decision or argue your case. Amy answers as a principal engineer, grounded in the documentation, its differences page and the decision records: a position, real options compared on the same quality attributes, the standards behind each argument, a pre-mortem, and what would change its mind, with links to the pages it used. It changes its position only on new evidence and says so.
+Available once **`<project> Architecture Documentation`** exists. Describe a decision or argue your case. Amy answers as a principal engineer, grounded in the documentation, its differences page and the decision records: a position, real options compared on the same quality attributes, the standards behind each argument, a pre-mortem, and what would change its mind, with links to the pages it used. It changes its position only on new evidence and says so.
 
 - **Mode:** **Advise** (Amy's own recommendation) or **Challenge me** (Amy argues against your proposal on purpose).
 - When Amy needs code, it reads specific files with your permissions and lists them under **Read from the code**.
@@ -248,7 +264,7 @@ Available once **`<project> Documentation`** exists. Describe a decision or argu
 
 ## Review a Pull Request
 
-On the **Code** tab. Available once **`<project> Documentation`** exists, like Debate Architecture. The review is **read-only**: it is shown in Amy only. Amy doesn't comment, vote or change anything on the pull request, and needs no extra permission.
+On the **Code** tab. Available once **`<project> Architecture Documentation`** exists, like Debate Architecture. The review is **read-only**: it is shown in Amy only. Amy doesn't comment, vote or change anything on the pull request, and needs no extra permission.
 
 1. **Choose the pull request.** The list shows the project's active pull requests: **I'm a reviewer**, **Created by me** or **All active**, optionally for one repository. To review a pull request of another project in the organization, paste its link.
 2. **Look for:** bugs and logic, security, reliability and performance, tests, readability and maintainability, whether the changes meet the linked work items, and whether they fit the architecture documentation. **Anything Amy should know** shifts the emphasis.
