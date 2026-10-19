@@ -32,7 +32,7 @@ Content is sent only when a user triggers the corresponding action:
 | Pull-request documentation checks | Nothing from the browser except the time frame and scope of on-demand reviews. The backend reads PR metadata (no code diff) and the configured Wiki pages itself |
 | MCP (AI clients) | The tool arguments the AI client sends; the backend reads the named Wiki pages and work items with the user's own permissions |
 
-Every request also carries a correlation ID, the Azure DevOps organization name and, as a label, the current project name. Backends offering `ai-settings` also receive the user's AI settings (model, thinking, response length, web search); the extension keeps them in memory for the conversation only.
+Every request also carries a correlation ID, the Azure DevOps organization name and, as a label, the current project name. Without a separate sign-in (`AUTH_MODE=azure-devops`), when a session starts the extension sends the user's Azure DevOps access token once: the backend asks Azure DevOps who the user is in the organization (`connectionData`), issues its own session and discards the token; it is neither stored nor logged. The token carries the extension's permissions (see [PERMISSIONS.md](PERMISSIONS.md)) and expires on its own. Backends offering `ai-settings` also receive the user's AI settings (model, thinking, response length, web search); the extension keeps them in memory for the conversation only.
 
 ## What the extension stores
 

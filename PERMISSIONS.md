@@ -33,7 +33,8 @@ Normal features need no administration permissions.
 - **Backend app identity:** Key Vault Secrets User, read-only, on the needed secrets.
   - With `STATE_STORE=blob` it also has Storage Blob Data Contributor on its state container (pull-request proposals, MCP proposals, architecture jobs, personas).
   - In Azure DevOps (pull-request checks, `ADO_AUTH_MODE`) it has Basic access, Read on the enabled repositories and Wikis, and Contribute to pull requests. It also reads the signed-in user's group memberships to recognize Project Collection Administrators as backend administrators; organization members can read memberships by default.
-- **Sign-in and MCP:** no backend identity. Delegated, read-only Azure DevOps permissions on the backend's Entra app registration: `vso.profile` (membership check at sign-in), `vso.wiki`, `vso.work` and `vso.code` (MCP tools acting as the signed-in user). Not `user_impersonation`: the backend never writes to Azure DevOps on a user's behalf.
+- **No separate sign-in (`AUTH_MODE=azure-devops`):** no backend identity and no app registration. When a session starts, the backend receives the user's Azure DevOps access token, with the extension's permissions above, and uses it once to ask Azure DevOps who the user is; it is neither stored nor logged.
+- **Microsoft sign-in (`AUTH_MODE=entra`) and MCP:** no backend identity. Delegated, read-only Azure DevOps permissions on the backend's Entra app registration: `vso.profile` (membership check at sign-in), `vso.wiki`, `vso.work` and `vso.code` (MCP tools acting as the signed-in user). Not `user_impersonation`: the backend never writes to Azure DevOps on a user's behalf.
 - **Secret administrators:** Key Vault Secrets Officer.
 - **Deployers:** resource-group Contributor.
 

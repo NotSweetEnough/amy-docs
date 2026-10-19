@@ -7,9 +7,9 @@ Amy's extension contains no credentials and no backend address. Each organizatio
 | Boundary | Control |
 | --- | --- |
 | Extension → organization configuration | Non-secret document in Azure DevOps extension data. Strict schema with unknown fields rejected; URL, HTTPS and trusted-hostname checks on every load; change history. Storage cannot restrict writers (see [ADMIN-CONFIGURATION.md](ADMIN-CONFIGURATION.md)), so every user confirms the backend hostname before first use and after every change. |
-| Extension → backend | HTTPS. Metadata check without following redirects. Entra ID sign-in run by the backend; the session token is kept in the browser tab's `sessionStorage` until it expires (never `localStorage` or cookies), and discarded when the backend rejects it. `Authorization` and `x-azdo-organization` headers; no cookies (`credentials: omit`). |
-| Backend authentication | Session token (HS256, `SESSION_SIGNING_KEY`): signature, issuer, **audience (this API only)**, expiry and required claims. At sign-in: ID token RS256 signature against the published keys, issuer, audience (the app's client ID), expiry, nonce, PKCE. |
-| Backend authorization | Allowed tenants; allowed Azure DevOps organizations (membership verified with Azure DevOps at sign-in, and the header must match the session); optional allowed users, groups or app role; enabled operations. A valid token alone is not enough. CORS is not used as authentication. |
+| Extension → backend | HTTPS. Metadata check without following redirects. Without a separate sign-in (`AUTH_MODE=azure-devops`), the user's Azure DevOps access token once per session, checked with Azure DevOps and discarded; with `AUTH_MODE=entra`, an Entra ID sign-in run by the backend. The session token is kept in the browser tab's `sessionStorage` until it expires (never `localStorage` or cookies), and discarded when the backend rejects it. `Authorization` and `x-azdo-organization` headers; no cookies (`credentials: omit`). |
+| Backend authentication | Session token (HS256, `SESSION_SIGNING_KEY`): signature, issuer, **audience (this API only)**, expiry and required claims. Azure DevOps token check: Azure DevOps itself confirms the user in the requested organization (`connectionData`); unauthenticated, anonymous and inactive identities are refused. At an Entra ID sign-in: ID token RS256 signature against the published keys, issuer, audience (the app's client ID), expiry, nonce, PKCE. |
+| Backend authorization | Allowed Azure DevOps organizations (membership verified with Azure DevOps when the session starts, and the header must match the session); with an Entra ID sign-in also allowed tenants and optional allowed users, groups or app role; enabled operations. A valid token alone is not enough. CORS is not used as authentication. |
 | Organization isolation | Usage counters, rate limits, concurrency, audit records and sign-in state are keyed by organization. The admin usage endpoint returns one organization at a time. |
 | Backend → secrets | Reference deployment: Key Vault (RBAC) references resolved by the App Service managed identity (Key Vault Secrets User, read-only). No Key Vault SDK; no secrets in IaC, pipelines or outputs. |
 | Backend → AI provider | HTTPS in production. The key is injected from validated configuration. Timeout and bounded retries. Upstream bodies are never logged or returned. |
@@ -37,8 +37,8 @@ Report vulnerabilities privately on GitHub: [Report a vulnerability](https://git
 
 ## Review checklist (backend operators)
 
-- [ ] `AUTH_MODE=entra`, with `ALLOWED_ORGANIZATIONS` and `ALLOWED_ORIGINS` limited to your organizations and the Marketplace iframe origin.
-- [ ] `ENTRA_CLIENT_SECRET`, `SESSION_SIGNING_KEY`, `AI_PROVIDER_API_KEY` (and `ADMIN_DIAGNOSTICS_TOKEN`) are Key Vault references, shown as resolved in the portal.
+- [ ] `AUTH_MODE=azure-devops` (or `entra`), with `ALLOWED_ORGANIZATIONS` and `ALLOWED_ORIGINS` limited to your organizations and the Marketplace iframe origin.
+- [ ] `SESSION_SIGNING_KEY`, `ENTRA_CLIENT_SECRET` (with `entra` or MCP), `AI_PROVIDER_API_KEY` (and `ADMIN_DIAGNOSTICS_TOKEN`) are Key Vault references, shown as resolved in the portal.
 - [ ] The app identity has only Key Vault Secrets User; secret administrators are separate.
 - [ ] User consent to unverified applications is restricted in your Entra tenant.
 - [ ] Usage limits match your budget; `AI_DISABLED` is known to on-call staff.

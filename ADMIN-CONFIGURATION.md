@@ -41,8 +41,8 @@ Amy protects users with checks that do not depend on who wrote the configuration
 
 1. **User confirmation.** Before any content is sent, each user sees the backend's name and hostname, plus who configured it and when. They must confirm it the first time and after every change.
 2. **The backend authenticates and authorizes every request.**
-   - Users sign in with the organization's Microsoft Entra ID.
-   - The backend accepts only its own tenant, the configured Azure DevOps organizations, and the configured users, groups or roles. It verifies organization membership with Azure DevOps at sign-in.
+   - Without a separate sign-in (`AUTH_MODE=azure-devops`, the default), Azure DevOps itself confirms each user in the organization when a session starts; the backend accepts only the configured Azure DevOps organizations.
+   - With a Microsoft sign-in (`AUTH_MODE=entra`), users sign in with the organization's Microsoft Entra ID, and the backend accepts only its own tenant, the configured Azure DevOps organizations, and the configured users, groups or roles. It verifies organization membership with Azure DevOps at sign-in.
    - A rogue URL can't impersonate your backend's sign-in. Restricting user consent to unverified applications in Entra ID blocks look-alike sign-ins.
 3. **Trusted hostname policy, stored URL validation and HTTPS** are rechecked on every load.
 4. **Tamper detection.** A malformed or tampered configuration document is rejected.
