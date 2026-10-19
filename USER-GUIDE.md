@@ -6,7 +6,7 @@ Open a project in Azure DevOps and select **Amy** in the project sidebar, next t
 
 1. **Backend configured.** An organization administrator must have connected a backend that your organization operates ([ADMIN-CONFIGURATION.md](ADMIN-CONFIGURATION.md)). Otherwise you see "AI features are not configured for this Azure DevOps organization". Loading and editing Wiki pages and creating work items still work.
 2. **Confirm the backend.** The first time, and after any change, confirm the backend your content is sent to. Amy shows its name and hostname.
-3. **Sign in.** Select **Sign in**. A pop-up uses your organization's Microsoft account; allow pop-ups for Azure DevOps. The sign-in lasts until you reload the page.
+3. **Sign in.** Select **Sign in**. A pop-up uses your organization's Microsoft account; allow pop-ups for Azure DevOps. If you are already signed in to Microsoft, the pop-up closes by itself. The sign-in lasts for this browser tab, also when you open Amy again, until it expires (an hour by default) or you close the tab.
 
 Quick actions that your organization's backend does not offer say so on their box.
 

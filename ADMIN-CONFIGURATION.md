@@ -27,11 +27,11 @@ Each change records who made it and when. The last 20 changes are listed under *
 | --- | --- | --- |
 | Backend URL, display name, enabled, API version, trusted hostnames, change history | Azure DevOps extension data, collection scope | This organization only |
 | "I confirm this backend" acknowledgement | Azure DevOps extension data, user scope | Per user |
-| Backend session token | Browser memory of the open page | Discarded on reload |
+| Backend session token | The browser tab's `sessionStorage` (memory only where the browser blocks it) | Until it expires (`SESSION_TTL_MINUTES`), the tab closes or the backend rejects it |
 | Project templates | Azure DevOps extension data, collection scope, one document per project | That project; changes need review and approval in **Project Templates** |
 | Pull-request check settings (repositories, Wiki scope, reviewers) | The organization's backend | This organization only |
 
-Nothing is stored in `localStorage`, `sessionStorage` or cookies.
+Nothing else is stored in the browser: no `localStorage` and no cookies.
 
 ## Who can change the configuration: platform limitation
 

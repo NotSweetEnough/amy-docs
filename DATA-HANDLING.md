@@ -38,10 +38,10 @@ Every request also carries a correlation ID, the Azure DevOps organization name 
 
 - **Organization configuration:** backend URL, display name, flags, API version, trusted hostnames and change history, in Azure DevOps extension data.
 - **Per user:** whether the user has confirmed a backend hostname, in Azure DevOps extension data.
-- **Backend session token:** in page memory only.
+- **Backend session token:** in the browser tab's `sessionStorage` until it expires, so Amy's pages in the same tab share one sign-in; removed when the tab closes or the backend rejects it.
 - **Project templates:** template names and section names per project, in Azure DevOps extension data.
 
-Nothing is stored in browser storage.
+Nothing else is stored in browser storage.
 
 ## User confirmation
 
