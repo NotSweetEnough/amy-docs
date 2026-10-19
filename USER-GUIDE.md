@@ -24,6 +24,8 @@ From top to bottom: the header with Amy's logo (AI settings) and the connection 
 
 Amy opens with **Ask Amy**. Selecting a tab shows its cards; selecting a card starts its task, and the cards collapse into a bar with the task's name and **Change action**. Drafts are kept when you switch tasks and come back.
 
+**From the project sidebar.** Hover over **Amy AI** in the project sidebar to see the five categories; select one to open Amy on that tab, with its quick actions. **Wiki** opens Amy as described above. Inside Amy, the tabs keep working as before; switching tabs there keeps your drafts and conversation, while selecting another category in the sidebar opens Amy again.
+
 **Wiki scope.** Questions and summaries use the active Wiki of the project (switch it next to the filter if the project has several):
 
 - **Entire Wiki:** all its pages.
