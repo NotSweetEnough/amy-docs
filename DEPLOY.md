@@ -122,6 +122,14 @@ az webapp config container set --name "<app>" --resource-group "<resource-group>
 az webapp restart --name "<app>" --resource-group "<resource-group>"
 ```
 
+With web search, the backend is the container named `main`. Update both containers to the new version instead:
+
+```powershell
+az webapp sitecontainers update --name "<app>" --resource-group "<resource-group>" --container-name main --image "ghcr.io/notsweetenough/amy-backend:<new-version>"
+az webapp sitecontainers update --name "<app>" --resource-group "<resource-group>" --container-name searxng --image "ghcr.io/notsweetenough/amy-searxng:<new-version>"
+az webapp restart --name "<app>" --resource-group "<resource-group>"
+```
+
 `/api/health` reports the running version. The extension and the backend are versioned independently; the extension works with any backend that offers the API version it needs and explains features a backend doesn't offer.
 
 ## Usage and cost controls
@@ -181,15 +189,47 @@ AI clients that support the Model Context Protocol (for example VS Code) can use
 2. Set `MCP_ENABLED=true`, plus `STATE_STORE` and `STATE_BLOB_CONTAINER_URL` as for pull-request checks.
 3. In the client, use the URL and the header `x-azdo-organization: <organization>`.
 
+## Optional: web search
+
+Questions can search the web when the Wiki doesn't answer them, or when the user asks for it (backend 0.11.2 or later). The backend uses [SearXNG](https://docs.searxng.org/), a free, self-hosted metasearch engine that passes the question to public search engines (for example Bing, DuckDuckGo, Brave and Wikipedia). It runs as a second container, a sidecar, in the backend's App Service: only the backend reaches it, at `http://localhost:8888`, and it needs no other Azure resources. The `amy-searxng` image is SearXNG with the settings the backend needs; use the backend's version.
+
+1. **Secret:** `Set-AmySecret "searxng-secret"` with 32+ random characters (generated as in step 3).
+2. **Sidecar mode:** an app with a single container takes sidecars once it's converted. The backend becomes the container named `main`, with its image and port unchanged:
+
+   ```powershell
+   az webapp sitecontainers convert --mode sitecontainers --name "<app>" --resource-group "<resource-group>"
+   ```
+
+3. **The SearXNG container:**
+
+   ```powershell
+   az webapp sitecontainers create --name "<app>" --resource-group "<resource-group>" `
+     --container-name searxng --image "ghcr.io/notsweetenough/amy-searxng:<version>" --target-port 8888
+   ```
+
+4. **Settings.** App settings reach every container, so SearXNG reads its secret from here:
+
+   ```powershell
+   az webapp config appsettings set --name "<app>" --resource-group "<resource-group>" --output none --settings `
+     "WEB_SEARCH_PROVIDER=searxng" `
+     "WEB_SEARCH_BASE_URL=http://localhost:8888" `
+     "SEARXNG_SECRET=@Microsoft.KeyVault(SecretUri=$kv/searxng-secret/)"
+   az webapp restart --name "<app>" --resource-group "<resource-group>"
+   ```
+
+5. **Check:** turn on **Web search** in Amy's settings and ask "Search the web for …". **App Service > Log stream** shows `Web search completed` with the number of results. With `statusCategory: network`, the SearXNG container isn't running; its log: `az webapp sitecontainers log --name "<app>" --resource-group "<resource-group>" --container-name searxng`.
+
+Only the question leaves the backend: SearXNG passes it to the search engines without user information, and they see the App Service's outbound address. Search engines may block data-center addresses, Google most often; SearXNG then pauses that engine for a while and answers from the others. SearXNG is open source under the AGPL-3.0 license ([source](https://github.com/searxng/searxng)); the `amy-searxng` image adds only its settings.
+
 ## Rotating secrets
 
-1. Create a **new version** of the secret in Key Vault (`ai-provider-api-key`, `entra-client-secret`, `session-signing-key` or `pr-docs-hook-secret`). The app settings don't change: the references always use the latest version.
+1. Create a **new version** of the secret in Key Vault (`ai-provider-api-key`, `entra-client-secret`, `session-signing-key`, `pr-docs-hook-secret` or `searxng-secret`). The app settings don't change: the references always use the latest version.
 2. Restart the app (`az webapp restart ...`) to use it immediately; otherwise App Service picks it up within a day.
 3. Check that AI requests work, then revoke the old credential at its source. Rotating `session-signing-key` signs everyone out; rotating `pr-docs-hook-secret` needs the new value in each service hook.
 
 ## Networking
 
-The defaults above give: HTTPS only with TLS 1.2+, Entra sign-in required, CORS limited to Amy's origin, Key Vault readable only by the app identity, and outbound HTTPS from App Service to your AI provider.
+The defaults above give: HTTPS only with TLS 1.2+, Entra sign-in required, CORS limited to Amy's origin, Key Vault readable only by the app identity, and outbound HTTPS from App Service to your AI provider (with web search, also from SearXNG to the public search engines).
 
 Where required, add App Service VNet integration (with all outbound traffic routed through the VNet) for a private AI endpoint or Key Vault, a Key Vault private endpoint with the `privatelink.vaultcore.azure.net` DNS zone, and access restrictions on the backend. Behind a proxy, set `HTTPS_PROXY` and `NODE_USE_ENV_PROXY=1`.
 
@@ -203,4 +243,5 @@ Where required, add App Service VNet integration (with all outbound traffic rout
 | Test connection in Amy fails with "could not be reached" | The URL starts with `https://` and has nothing after the host; `ALLOWED_ORIGINS` is exactly as in step 4. |
 | Users are asked for admin approval when signing in | Step 1.5: grant admin consent. |
 | "The AI provider could not be reached" | Outbound access to the provider, the URL, or a proxy (see Networking). |
+| `Web search failed` with `status: 403` in the log | The SearXNG container must use the `amy-searxng` image: plain SearXNG refuses the backend's JSON requests. |
 | AI requests fail with HTTP 400 for newer Claude models | Leave `AI_PROVIDER_TEMPERATURE` empty: Claude 4.7 and later reject it. |

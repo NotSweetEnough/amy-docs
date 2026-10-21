@@ -78,12 +78,16 @@ AI_MODELS=[{"id":"qwen3.5-4b","label":"Qwen3.5 4B","model":"qwen3.5-amy:4b","loc
 | Setting | Meaning |
 | --- | --- |
 | `WEB_SEARCH_PROVIDER` | `none` (default), `searxng` (self-hosted [SearXNG](https://docs.searxng.org/) with the JSON format enabled) or `brave` ([Brave Search API](https://brave.com/search/api/)) |
-| `WEB_SEARCH_BASE_URL` | SearXNG base URL, for example `http://localhost:8080` (https in production) |
+| `WEB_SEARCH_BASE_URL` | SearXNG base URL: `http://localhost:8888` for SearXNG next to the backend (below). Elsewhere https in production |
 | `WEB_SEARCH_API_KEY` | [SECRET] Brave subscription token; a Key Vault reference in production |
 | `WEB_SEARCH_MAX_RESULTS` | Results passed to the model, 1–10 (default 5) |
 | `WEB_SEARCH_TIMEOUT_MS` | Default 10000 |
 
 Web search is offered (capability `web-search`) only when a provider is configured and `ENABLED_OPERATIONS` allows it. It applies to questions only. The backend sends the user's question, and nothing else, to the search service; review that service's data terms before enabling it. Logs record result counts and durations, never the query.
+
+### SearXNG next to the backend
+
+[SearXNG](https://docs.searxng.org/) is a free, self-hosted metasearch engine: it passes the question to public search engines (for example Bing, DuckDuckGo, Brave and Wikipedia) and returns their results. It runs as a sidecar container in the backend's App Service, from the `amy-searxng` image: only the backend reaches it, at `http://localhost:8888`, and it needs no extra Azure resources. Setup: [DEPLOY.md](DEPLOY.md#optional-web-search).
 
 ## Validation at startup
 

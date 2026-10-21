@@ -234,7 +234,7 @@ Selecting a release instead of a sprint is not available yet. To create the spri
 Select **Documentation > Generate Project Documentation**. Your organization's backend must offer it; it is off unless an administrator enables it, because source code and Wiki content are sent to the backend and its AI provider. Two tabs, one job each (both can run and wait for review at the same time):
 
 - **Create architecture documentation**: from the repositories and the Wiki, an arc42 tree under **`<project> Architecture Documentation`**, described below.
-- **Create project management documentation**: the Wiki's content reorganized into a new tree under **`<project> Management Documentation`**, described after it.
+- **Create project management documentation**: the content of this project's Wiki, and of other projects' Wikis if you choose them, reorganized into a new tree under **`<project> Management Documentation`** in this project's Wiki, described after it.
 
 The two trees don't repeat each other: the architecture documentation leaves out project management topics (roadmap, team, way of working, meetings) and links the management documentation instead, and the other way around for architecture topics (system structure, components, infrastructure, technical decisions).
 
@@ -251,10 +251,11 @@ The two trees don't repeat each other: the architecture documentation leaves out
 
 ### Create project management documentation
 
-1. **Start.** Amy shows how many Wiki pages it reorganizes: the whole Wiki except the architecture documentation, its own tree and old `/Amy` persona pages, up to 2,000 pages (a larger Wiki gets a warning: only the first 2,000 are included), with an estimate of the time and of the input and output tokens. If a page named `<project> Management Documentation` exists that Amy did not create, enter another name.
-2. **Running.** Three steps on your organization's backend: **Understand the pages** (what each page holds), **Design the structure** (a page tree built from the content, closer to how software teams document a project; internal procedures and team-specific topics keep their own sections) and **Write pages**. For a Wiki of more than 150 pages, the structure is designed in two levels: first the top-level areas, then the pages of each area, with up to 15 original pages behind each new page so their content is kept. A few pages are written at the same time; a Wiki of about 1,000 pages takes roughly 30 to 70 minutes. The tile shows a red bubble when the result is ready.
-3. **Review.** The new tree with a preview of each page, **Source Coverage** (where each original page's content went now, or that the architecture documentation covers it) and **About This Documentation**. The new tree stands on its own: links between old pages point to the new pages that hold that content, and nothing links back into the old Wiki. Existing pages are never changed or moved; delete them yourself once the new tree is in use.
-4. **Running it again** proposes changes to the existing tree: changed pages side by side, new pages, and pages that are no longer part of the structure (flagged, never deleted).
+1. **Choose the Wikis.** This project's Wiki is chosen. Under **Projects**, add projects whose Wikis belong to the same product or team: their project Wiki is chosen when you add them, code Wikis (published from a repository) only when you check them. You can also leave this project's Wiki out. The new tree always goes to this project's Wiki; the other Wikis are only read. Their pages appear under `/<project>/<wiki>` in **Source Coverage**, and their links to Wiki pages and attachments become plain text, since those lead nowhere in this project's Wiki.
+2. **Start.** Amy shows how many pages it reorganizes: the chosen Wikis except the architecture documentation, the management documentation and old `/Amy` persona pages, up to 2,000 pages in all (more get a warning: only the first 2,000 are included, this project's Wiki first), with an estimate of the time and of the input and output tokens. If a page named `<project> Management Documentation` exists that Amy did not create, enter another name.
+3. **Running.** Three steps on your organization's backend: **Understand the pages** (what each page holds), **Design the structure** (a page tree built from the content, closer to how software teams document a project; internal procedures and team-specific topics keep their own sections) and **Write pages**. For a Wiki of more than 150 pages, the structure is designed in two levels: first the top-level areas, then the pages of each area, with up to 15 original pages behind each new page so their content is kept. A few pages are written at the same time; a Wiki of about 1,000 pages takes roughly 30 to 70 minutes. The tile shows a red bubble when the result is ready.
+4. **Review.** The new tree with a preview of each page, **Source Coverage** (where each original page's content went now, or that the architecture documentation covers it) and **About This Documentation**. The new tree stands on its own: links between old pages point to the new pages that hold that content, and nothing links back into the old Wiki. Existing pages are never changed or moved; delete them yourself once the new tree is in use.
+5. **Running it again** proposes changes to the existing tree: changed pages side by side, new pages, and pages that are no longer part of the structure (flagged, never deleted).
 
 The method comes from the **Project Management Documentation** persona.
 
@@ -264,6 +265,7 @@ Available once **`<project> Architecture Documentation`** exists. Describe a dec
 
 - **Mode:** **Advise** (Amy's own recommendation) or **Challenge me** (Amy argues against your proposal on purpose).
 - When Amy needs code, it reads specific files with your permissions and lists them under **Read from the code**.
+- **Sources** lists the documentation pages the answer cites. Quotes that aren't found word for word in the documentation are removed. When nothing is cited, Sources says so: check what the answer says about the system.
 - The method comes from the **Architecture Debate** persona (the Grand Master method by default). Debates use the model set for them (or your own choice), with thinking on unless the persona's effort or your setting says otherwise.
 - **Save as decision record (ADR)…** drafts a record in the MADR format under **9 Architecture Decisions**; edit it and select **Create page**.
 
