@@ -182,6 +182,14 @@ Each answer lists its sources: page link, section heading, Wiki and the exact su
 4. Select **Draft page**. Amy first lists existing pages with a similar name; continue only if none of them should be edited instead.
 5. The review shows the **destination Wiki** (the active Wiki; changeable here if the project has several), the title and location, the content and any similar pages. Edit what you need and select **Create Wiki page**. Existing pages are never overwritten. **Request another version** drafts it again.
 
+## Update the Wiki
+
+One change applied to every page it affects, for example "The new project manager is Mike Brown" or "The team now has only these roles: operations manager, project manager, application owner, product owner". Available when your organization's backend offers it.
+
+1. **Describe the change** under **What changed?** and choose the pages of the active Wiki: **All pages**, or **Selected pages** (search, pick several, **Include their subpages** for whole branches). Amy searches the pages for the names and roles the change concerns, also in their other spellings and languages, and sends only those pages to the AI; **Let the AI read every page** checks every page instead (slower, more tokens; the estimate is shown). Select **Find affected pages**. The job runs on your organization's backend: you can close Amy, and the tile shows a red bubble when your decisions are needed.
+2. **Your decisions.** Amy shows the change as it understood it, the affected pages with the reason for each, and questions about what it can't know, for example who takes over the duties of a role that no longer exists. Pick an answer or write another one; a question left unanswered makes the AI leave what it concerns unchanged. Records of the past (meeting minutes, decision records, release notes) are listed but not chosen: they stay as they were unless you choose them. Select **Propose changes for N pages** (up to 300).
+3. **Review.** Each page shows its proposed edits; **Review changes** compares them side by side, and you accept or reject each one before **Save this page**. **Save N pages** saves the chosen pages with all their edits. The edits are placed on each page as it is now: an edit whose text someone changed in the meantime is left out, and a page is never overwritten. The previous versions stay in each page's history. **Discard** deletes the stored result.
+
 ## Create Work Items
 
 Enter a **title** and a **short description**, choose the work-item types and select **Generate proposal**. The proposal opens in the same review as a generated backlog (sections 3 to 5). Possible duplicates are checked before creation. If your organization uses Amy's MCP server, proposals you requested from an AI client are listed here (**From your AI clients**); load one to review, edit and create its items.
