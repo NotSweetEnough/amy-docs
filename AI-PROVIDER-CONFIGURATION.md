@@ -83,7 +83,7 @@ AI_MODELS=[{"id":"qwen3.5-4b","label":"Qwen3.5 4B","model":"qwen3.5-amy:4b","loc
 | `WEB_SEARCH_MAX_RESULTS` | Results passed to the model, 1–10 (default 5) |
 | `WEB_SEARCH_TIMEOUT_MS` | Default 10000 |
 
-Web search is offered (capability `web-search`) only when a provider is configured and `ENABLED_OPERATIONS` allows it. It applies to questions only. The backend sends the user's question, and nothing else, to the search service; review that service's data terms before enabling it. Logs record result counts and durations, never the query.
+Web search is offered (capability `web-search`) only when a provider is configured and `ENABLED_OPERATIONS` allows it. It applies to questions only. The backend sends the user's question, and nothing else, to the search service; review that service's data terms before enabling it. A question that looks like it contains a key, password, token or connection-string secret is never sent: the backend answers it from the Wiki only, with a warning, and logs `Web search skipped`. Logs record result counts and durations, never the query.
 
 ### SearXNG next to the backend
 
