@@ -221,6 +221,22 @@ Questions can search the web when the Wiki doesn't answer them, or when the user
 
 Only the question leaves the backend: SearXNG passes it to the search engines without user information, and they see the App Service's outbound address. Search engines may block data-center addresses, Google most often; SearXNG then pauses that engine for a while and answers from the others. SearXNG is open source under the AGPL-3.0 license ([source](https://github.com/searxng/searxng)); the `amy-searxng` image adds only its settings.
 
+## Optional: features that read your code or search your content
+
+These stay off until you set them. All need `STATE_STORE=blob` and `STATE_BLOB_CONTAINER_URL` as for pull-request checks. The features marked "own access" also need the backend's own Azure DevOps access (`ADO_AUTH_MODE=managed-identity`, as for pull-request checks).
+
+| Setting | Feature | Needs |
+| --- | --- | --- |
+| `REPO_DOCS_ENABLED=true` | Repository Documentation: reads all of a repository's code and opens a pull request with its documentation set. | Own access, with Read, Contribute, Create branch and Contribute to pull requests on the repositories administrators enable. |
+| `MOCKUP_DESIGNER_ENABLED=true` | Mockup Designer. | Own access. Its agent needs Claude (`AI_PROVIDER=anthropic-vertex`). |
+| `MOCKUP_BROWSER=server`, `MOCKUP_BROWSER_ENDPOINT=wss://…` | Lets the Mockup Designer open your test environments in a Playwright browser server you run. | A browser server of the same Playwright version as the backend. |
+| `DELIGHT_CHECK_ENABLED=true` | Delight Check: every UI page found in the code scored on Product Delight. | Sends UI code to your AI provider. |
+| `HOW_IT_WORKS_ENABLED=true` | How It Works Today: the application's screens described from the code. | Sends UI and backend code to your AI provider. |
+| `AZURE_SEARCH_ENDPOINT=https://…` | Ask with search and Diagnose a Ticket. | Own access, and Azure AI Search with the roles Search Service Contributor and Search Index Data Contributor for the managed identity. |
+| `GRAFANA_URL=https://…` | Logs and traces for Diagnose a Ticket and Ask. | The Grafana Viewer role for the managed identity. |
+
+Design Requirements, Access by tab and sprint documents at the end of each sprint need `STATE_STORE=blob`; Access by tab and sprint documents also need the backend's own access. Administrators then set each feature up under **Organization settings > Amy AI**.
+
 ## Rotating secrets
 
 1. Create a **new version** of the secret in Key Vault (`ai-provider-api-key`, `entra-client-secret`, `session-signing-key`, `pr-docs-hook-secret` or `searxng-secret`). The app settings don't change: the references always use the latest version.

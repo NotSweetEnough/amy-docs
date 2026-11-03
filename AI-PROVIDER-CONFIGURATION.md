@@ -29,6 +29,29 @@ Request format sent by `openai-compatible`:
 // expected response: { "content": [{ "type": "text", "text": "<JSON>" }], "usage": { ... } (optional) }
 ```
 
+**Amy's designer** (Mockup Designer) works with tools and streams its long answers from `:streamRawPredict` (the same path and headers, `"stream": true`, answered with server-sent events). When the provider or a gateway in front of it refuses that endpoint (401, 403, 404 or 405), the backend logs it and asks `:rawPredict` instead until it restarts: each answer must then arrive within `AI_PROVIDER_TIMEOUT_MS` and is capped at `AI_PROVIDER_MAX_OUTPUT_TOKENS`, so the designer writes long pages in parts. Allow `:streamRawPredict` on the gateway for the best results.
+
+### Claude models: thinking and effort
+
+Claude Opus 5.5, Sonnet 5.5 and Haiku 5.5 always think adaptively: they decide how much to think, and Opus 5.5 and Sonnet 5.5 refuse requests that switch thinking off. Configure them with `"thinking": "always"`, and older Claude models (4.5 and earlier) with `"thinking": "unsupported"`; Vertex AI takes the plain model names.
+
+```
+AI_MODELS=[{"id":"opus-5-5","label":"Claude Opus 5.5","model":"claude-opus-5-5","location":"cloud","thinking":"always","default":true},{"id":"sonnet-5-5","label":"Claude Sonnet 5.5","model":"claude-sonnet-5-5","location":"cloud","thinking":"always"},{"id":"haiku-5-5","label":"Claude Haiku 5.5","model":"claude-haiku-5-5","location":"cloud","thinking":"always"}]
+AI_PROVIDER_MAX_OUTPUT_TOKENS=32000
+AI_PROVIDER_TIMEOUT_MS=300000
+```
+
+**Effort.** Each quick action's effort in Personas (Low, Medium, High, Extra high, Max) is sent as `"output_config": {"effort": …}`. "Off" becomes Low, because Claude keeps thinking. Without an effort, the model's own default applies: Medium on Opus 5.5 and Haiku 5.5, High on Sonnet 5.5.
+
+**Starting points:**
+- Low for Ask Amy and work-item fields;
+- High for Generate Project Documentation and pull-request reviews;
+- Max for Debate Architecture.
+
+Higher effort means more thinking: more output tokens, cost and time.
+
+**Output tokens.** Thinking counts toward `max_tokens`. Keep `AI_PROVIDER_MAX_OUTPUT_TOKENS` at 32000 or more, so long answers aren't cut short, and allow a few minutes per request.
+
 If your provider needs a different format, adapt `buildBody()` and `extractContent()` in `backend/src/providers/http-provider.ts`; nothing else depends on the wire format.
 
 ## Settings
@@ -83,7 +106,7 @@ AI_MODELS=[{"id":"qwen3.5-4b","label":"Qwen3.5 4B","model":"qwen3.5-amy:4b","loc
 | `WEB_SEARCH_MAX_RESULTS` | Results passed to the model, 1–10 (default 5) |
 | `WEB_SEARCH_TIMEOUT_MS` | Default 10000 |
 
-Web search is offered (capability `web-search`) only when a provider is configured and `ENABLED_OPERATIONS` allows it. It applies to questions only. The backend sends the user's question, and nothing else, to the search service; review that service's data terms before enabling it. A question that looks like it contains a key, password, token or connection-string secret is never sent: the backend answers it from the Wiki only, with a warning, and logs `Web search skipped`. Logs record result counts and durations, never the query.
+Web search is offered (capability `web-search`) only when a provider is configured and `ENABLED_OPERATIONS` allows it, and Amy then has it on by default; users can turn it off in Amy's settings. It applies to questions, Create Work Items, Design Requirements, Review a Pull Request, Debate Architecture, Ask with search and Diagnose a Ticket. The backend sends up to three search terms the AI model writes from the request (for a question, from the question with its personal data masked), naming only public products, standards or regulations; Ask with search and Diagnose a Ticket send the agent's search queries, at most 5 per answer. Since backend 0.15.2 a term or query is never sent when it names the organization, the project, a repository, Wiki, board, team or log service, or holds an address, a file path with folders, a GUID or masked personal data; the backend logs `Web search skipped` with `reason: internal-detail`. Nothing else is sent to the search service; review that service's data terms before enabling it. A question or term that looks like it contains a key, password, token or connection-string secret is never sent: the backend works without the web, with a warning, and logs `Web search skipped`. Logs record result counts and durations, never the query.
 
 ### SearXNG next to the backend
 
