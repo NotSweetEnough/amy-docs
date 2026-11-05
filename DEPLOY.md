@@ -228,6 +228,7 @@ These stay off until you set them. All need `STATE_STORE=blob` and `STATE_BLOB_C
 | Setting | Feature | Needs |
 | --- | --- | --- |
 | `REPO_DOCS_ENABLED=true` | Repository Documentation: reads all of a repository's code and opens a pull request with its documentation set. | Own access, with Read, Contribute, Create branch and Contribute to pull requests on the repositories administrators enable. |
+| `CODE_AGENT_ENABLED=true` | Code with Amy: from a task or a work item to a pull request ready for review, after a person approves the plan. Only organization administrators and the teams they allow see it. | Own access, with Read, Contribute, Create branch and Contribute to pull requests on the repositories administrators enable, and View builds and Queue builds on the pipelines that validate their pull requests. `AI_PROVIDER=anthropic-vertex`. |
 | `MOCKUP_DESIGNER_ENABLED=true` | Mockup Designer. | Own access. Its agent needs Claude (`AI_PROVIDER=anthropic-vertex`). |
 | `MOCKUP_BROWSER=server`, `MOCKUP_BROWSER_ENDPOINT=wss://…` | Lets the Mockup Designer open your test environments in a Playwright browser server you run. | A browser server of the same Playwright version as the backend. |
 | `DELIGHT_CHECK_ENABLED=true` | Delight Check: every UI page found in the code scored on Product Delight. | Sends UI code to your AI provider. |
