@@ -3,7 +3,7 @@
 Amy's backend runs in **your** Azure subscription, with **your** AI provider and credentials. It is published as a container image; you don't build anything:
 
 ```text
-ghcr.io/notsweetenough/amy-backend:<version>     for example 0.2.0
+ghcr.io/notsweetenough/amy-backend:<version>
 ```
 
 This guide deploys it on Azure App Service for Containers, with secrets in Azure Key Vault and a managed identity. About 30 minutes; you need **Contributor** and **User Access Administrator** (or **Owner**) on a resource group, and the right to create an app registration in Microsoft Entra ID.
@@ -15,7 +15,7 @@ flowchart LR
   APP -- "HTTPS + API key" --> AI[("Your AI provider")]
 ```
 
-Replace the placeholders in the commands: `<resource-group>`, `<location>`, `<app>` (globally unique; the backend URL becomes `https://<app>.azurewebsites.net`), `<plan>`, `<key-vault>`, `<tenant-id>`, `<client-id>`, `<organization>` (the name in `https://dev.azure.com/<organization>`). The commands are for PowerShell with the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
+Replace the placeholders in the commands: `<version>` (the newest on the [package page](https://github.com/users/NotSweetEnough/packages/container/package/amy-backend)), `<resource-group>`, `<location>`, `<app>` (globally unique; the backend URL becomes `https://<app>.azurewebsites.net`), `<plan>`, `<key-vault>`, `<tenant-id>`, `<client-id>`, `<organization>` (the name in `https://dev.azure.com/<organization>`). The commands are for PowerShell with the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
 
 ## 1. Register the backend in Microsoft Entra ID
 
@@ -35,7 +35,7 @@ Optional: define an app role (for example `Amy.User`), assign it to users or gro
 az login
 az group create --name "<resource-group>" --location "<location>"
 az appservice plan create --name "<plan>" --resource-group "<resource-group>" --is-linux --sku B1
-az webapp create --name "<app>" --resource-group "<resource-group>" --plan "<plan>" --container-image-name "ghcr.io/notsweetenough/amy-backend:0.2.0"
+az webapp create --name "<app>" --resource-group "<resource-group>" --plan "<plan>" --container-image-name "ghcr.io/notsweetenough/amy-backend:<version>"
 az webapp update --name "<app>" --resource-group "<resource-group>" --https-only true
 az webapp config set --name "<app>" --resource-group "<resource-group>" --min-tls-version 1.2 --ftps-state Disabled --always-on true
 $appId = az webapp show --name "<app>" --resource-group "<resource-group>" --query id -o tsv
@@ -227,6 +227,7 @@ These stay off until you set them. All need `STATE_STORE=blob` and `STATE_BLOB_C
 
 | Setting | Feature | Needs |
 | --- | --- | --- |
+| `ARCHITECTURE_DOCS_ENABLED=true` | Generate Project Documentation and Repository Documentation: Check, and with them Debate Architecture and Review a Pull Request once a project's architecture documentation exists. `ARCHITECTURE_MAX_UPLOAD_BYTES` limits the code sent per generation (25,000,000 characters by default, at most 60,000,000). | Sends source code and Wiki content to your AI provider. The extension reads the repositories with each user's own permissions. |
 | `REPO_DOCS_ENABLED=true` | Repository Documentation: reads all of a repository's code and opens a pull request with its documentation set. | Own access, with Read, Contribute, Create branch and Contribute to pull requests on the repositories administrators enable. |
 | `CODE_AGENT_ENABLED=true` | Code with Amy: from a task or a work item to a pull request ready for review, after a person approves the plan. Only organization administrators and the teams they allow see it. | Own access, with Read, Contribute, Create branch and Contribute to pull requests on the repositories administrators enable, and View builds and Queue builds on the pipelines that validate their pull requests. `AI_PROVIDER=anthropic-vertex`. |
 | `MOCKUP_DESIGNER_ENABLED=true` | Mockup Designer. | Own access. Its agent needs Claude (`AI_PROVIDER=anthropic-vertex`). |
