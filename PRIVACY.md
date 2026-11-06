@@ -20,8 +20,10 @@ Details: [DATA-HANDLING.md](https://github.com/NotSweetEnough/amy-docs/blob/main
 
 If you contact us through the public issue tracker, what you write is public. Don't include personal data, credentials or content from your Azure DevOps organization.
 
+If you write to contact@valor-co.com, we receive your e-mail address and what you write, and use them to answer you. When you ask for access to the backend image, we also keep your Azure DevOps organization's name, to manage that access for as long as you have it.
+
 ## Changes and contact
 
-We publish changes to this statement with the date below. Questions: [issue tracker](https://github.com/NotSweetEnough/amy-docs/issues).
+We publish changes to this statement with the date below. Questions: [contact@valor-co.com](mailto:contact@valor-co.com) or the [issue tracker](https://github.com/NotSweetEnough/amy-docs/issues).
 
-Last updated: 2026-10-14.
+Last updated: 2026-11-06.

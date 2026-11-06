@@ -6,7 +6,7 @@ Amy's backend runs in **your** Azure subscription, with **your** AI provider and
 amyvalorconsulting.azurecr.io/amy-backend:<version>
 ```
 
-Pulling the image needs your organization's registry credentials, a user and a password. Ask for them through [support](SUPPORT.md) and name your Azure DevOps organization. Keep them secret; they are for your organization only.
+Pulling the image needs your organization's registry credentials, a user and a password. Ask for them at [contact@valor-co.com](mailto:contact@valor-co.com) and name your Azure DevOps organization. Keep them secret; they are for your organization only.
 
 This guide deploys it on Azure App Service for Containers, with secrets in Azure Key Vault and a managed identity. About 30 minutes; you need **Contributor** and **User Access Administrator** (or **Owner**) on a resource group, and the right to create an app registration in Microsoft Entra ID.
 
@@ -275,6 +275,6 @@ Where required, add App Service VNet integration (with all outbound traffic rout
 | Test connection in Amy fails with "could not be reached" | The URL starts with `https://` and has nothing after the host; `ALLOWED_ORIGINS` is exactly as in step 4. |
 | Users are asked for admin approval when signing in | Step 1.5: grant admin consent. |
 | "The AI provider could not be reached" | Outbound access to the provider, the URL, or a proxy (see Networking). |
-| The container doesn't start, and the log shows `unauthorized` or an image pull failure | The registry user or password is wrong or no longer valid. Ask for new credentials through [support](SUPPORT.md), then set them with `az webapp config container set --container-registry-user … --container-registry-password …` (with web search, `az webapp sitecontainers update --container-name main --registry-username … --registry-password …`). |
+| The container doesn't start, and the log shows `unauthorized` or an image pull failure | The registry user or password is wrong or no longer valid. Ask for new credentials at [contact@valor-co.com](mailto:contact@valor-co.com), then set them with `az webapp config container set --container-registry-user … --container-registry-password …` (with web search, `az webapp sitecontainers update --container-name main --registry-username … --registry-password …`). |
 | `Web search failed` with `status: 403` in the log | The SearXNG container must use the `amy-searxng` image: plain SearXNG refuses the backend's JSON requests. |
 | AI requests fail with HTTP 400 for newer Claude models | Leave `AI_PROVIDER_TEMPERATURE` empty: Claude 4.7 and later reject it. |
