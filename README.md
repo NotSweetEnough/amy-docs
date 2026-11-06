@@ -7,7 +7,7 @@ Amy AI is an assistant for Azure DevOps Wikis, work items and pull-request docum
 ## Get started
 
 1. **Install** Amy AI from the Visual Studio Marketplace into your Azure DevOps organization.
-2. **Deploy the backend** in your Azure subscription from the published container image `ghcr.io/notsweetenough/amy-backend`: [DEPLOY.md](DEPLOY.md).
+2. **Deploy the backend** in your Azure subscription from the private container image `amyvalorconsulting.azurecr.io/amy-backend`, with registry credentials from the publisher: [DEPLOY.md](DEPLOY.md).
 3. **Connect it:** open **Amy** in any project, select the **Amy logo**, then **Backend settings**, enter the backend URL, test the connection and save: [ADMIN-CONFIGURATION.md](ADMIN-CONFIGURATION.md).
 
 Until a backend is connected, the features without AI keep working and the AI features explain what is missing.

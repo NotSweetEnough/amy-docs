@@ -1,10 +1,12 @@
 # Deploy the backend
 
-Amy's backend runs in **your** Azure subscription, with **your** AI provider and credentials. It is published as a container image; you don't build anything:
+Amy's backend runs in **your** Azure subscription, with **your** AI provider and credentials. It is published as a private container image; you don't build anything:
 
 ```text
-ghcr.io/notsweetenough/amy-backend:<version>
+amyvalorconsulting.azurecr.io/amy-backend:<version>
 ```
+
+Pulling the image needs your organization's registry credentials, a user and a password. Ask for them through [support](SUPPORT.md) and name your Azure DevOps organization. Keep them secret; they are for your organization only.
 
 This guide deploys it on Azure App Service for Containers, with secrets in Azure Key Vault and a managed identity. About 30 minutes; you need **Contributor** and **User Access Administrator** (or **Owner**) on a resource group, and the right to create an app registration in Microsoft Entra ID.
 
@@ -15,7 +17,13 @@ flowchart LR
   APP -- "HTTPS + API key" --> AI[("Your AI provider")]
 ```
 
-Replace the placeholders in the commands: `<version>` (the newest on the [package page](https://github.com/users/NotSweetEnough/packages/container/package/amy-backend)), `<resource-group>`, `<location>`, `<app>` (globally unique; the backend URL becomes `https://<app>.azurewebsites.net`), `<plan>`, `<key-vault>`, `<tenant-id>`, `<client-id>`, `<organization>` (the name in `https://dev.azure.com/<organization>`). The commands are for PowerShell with the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
+To see the published versions:
+
+```powershell
+az acr repository show-tags --name amyvalorconsulting --repository amy-backend --username "<registry-user>" --password "<registry-password>" -o table
+```
+
+Replace the placeholders in the commands: `<version>` (the newest in that list), `<registry-user>` and `<registry-password>`, `<resource-group>`, `<location>`, `<app>` (globally unique; the backend URL becomes `https://<app>.azurewebsites.net`), `<plan>`, `<key-vault>`, `<tenant-id>`, `<client-id>`, `<organization>` (the name in `https://dev.azure.com/<organization>`). The commands are for PowerShell with the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
 
 ## 1. Register the backend in Microsoft Entra ID
 
@@ -35,7 +43,10 @@ Optional: define an app role (for example `Amy.User`), assign it to users or gro
 az login
 az group create --name "<resource-group>" --location "<location>"
 az appservice plan create --name "<plan>" --resource-group "<resource-group>" --is-linux --sku B1
-az webapp create --name "<app>" --resource-group "<resource-group>" --plan "<plan>" --container-image-name "ghcr.io/notsweetenough/amy-backend:<version>"
+az webapp create --name "<app>" --resource-group "<resource-group>" --plan "<plan>" `
+  --container-image-name "amyvalorconsulting.azurecr.io/amy-backend:<version>" `
+  --container-registry-url "https://amyvalorconsulting.azurecr.io" `
+  --container-registry-user "<registry-user>" --container-registry-password "<registry-password>"
 az webapp update --name "<app>" --resource-group "<resource-group>" --https-only true
 az webapp config set --name "<app>" --resource-group "<resource-group>" --min-tls-version 1.2 --ftps-state Disabled --always-on true
 $appId = az webapp show --name "<app>" --resource-group "<resource-group>" --query id -o tsv
@@ -50,7 +61,7 @@ $me = az ad signed-in-user show --query id -o tsv
 az role assignment create --role "Key Vault Secrets Officer" --assignee-object-id $me --assignee-principal-type User --scope $kvId
 ```
 
-The image is public; App Service pulls it without registry credentials. Role assignments can take a few minutes to apply.
+App Service keeps the registry credentials in its settings and uses them for every pull. Role assignments can take a few minutes to apply.
 
 ## 3. Store the secrets
 
@@ -115,17 +126,18 @@ An organization administrator (Project Collection Administrators) opens **Amy** 
 
 ## Updating
 
-New backend versions are published as new image tags; see the [package page](https://github.com/users/NotSweetEnough/packages/container/package/amy-backend). Pin a version, and move to a new one deliberately:
+New backend versions are published as new image tags; the start of this guide shows how to list them. Pin a version, and move to a new one deliberately:
 
 ```powershell
-az webapp config container set --name "<app>" --resource-group "<resource-group>" --container-image-name "ghcr.io/notsweetenough/amy-backend:<new-version>"
+az webapp config container set --name "<app>" --resource-group "<resource-group>" --container-image-name "amyvalorconsulting.azurecr.io/amy-backend:<new-version>"
 az webapp restart --name "<app>" --resource-group "<resource-group>"
 ```
 
 With web search, the backend is the container named `main`. Update both containers to the new version instead:
 
 ```powershell
-az webapp sitecontainers update --name "<app>" --resource-group "<resource-group>" --container-name main --image "ghcr.io/notsweetenough/amy-backend:<new-version>"
+az webapp sitecontainers update --name "<app>" --resource-group "<resource-group>" --container-name main --image "amyvalorconsulting.azurecr.io/amy-backend:<new-version>" `
+  --registry-username "<registry-user>" --registry-password "<registry-password>"
 az webapp sitecontainers update --name "<app>" --resource-group "<resource-group>" --container-name searxng --image "ghcr.io/notsweetenough/amy-searxng:<new-version>"
 az webapp restart --name "<app>" --resource-group "<resource-group>"
 ```
@@ -198,6 +210,8 @@ Questions can search the web when the Wiki doesn't answer them, or when the user
 
    ```powershell
    az webapp sitecontainers convert --mode sitecontainers --name "<app>" --resource-group "<resource-group>"
+   az webapp sitecontainers update --name "<app>" --resource-group "<resource-group>" --container-name main --image "amyvalorconsulting.azurecr.io/amy-backend:<version>" `
+     --registry-username "<registry-user>" --registry-password "<registry-password>"
    ```
 
 3. **The SearXNG container:**
@@ -261,5 +275,6 @@ Where required, add App Service VNet integration (with all outbound traffic rout
 | Test connection in Amy fails with "could not be reached" | The URL starts with `https://` and has nothing after the host; `ALLOWED_ORIGINS` is exactly as in step 4. |
 | Users are asked for admin approval when signing in | Step 1.5: grant admin consent. |
 | "The AI provider could not be reached" | Outbound access to the provider, the URL, or a proxy (see Networking). |
+| The container doesn't start, and the log shows `unauthorized` or an image pull failure | The registry user or password is wrong or no longer valid. Ask for new credentials through [support](SUPPORT.md), then set them with `az webapp config container set --container-registry-user … --container-registry-password …` (with web search, `az webapp sitecontainers update --container-name main --registry-username … --registry-password …`). |
 | `Web search failed` with `status: 403` in the log | The SearXNG container must use the `amy-searxng` image: plain SearXNG refuses the backend's JSON requests. |
 | AI requests fail with HTTP 400 for newer Claude models | Leave `AI_PROVIDER_TEMPERATURE` empty: Claude 4.7 and later reject it. |
